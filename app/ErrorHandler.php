@@ -36,7 +36,14 @@ class ErrorHandler {
             return FALSE;
     }
 
-    public static function processException() {
-
+    public static function processException($e) {
+        $msg = $e->getMessage() . ", trace: " . $e->getTraceAsString();
+        try {
+            App::getInstance()->logger->emergency($e);
+        } catch (\Exception $e2) {
+            ob_get_level() AND ob_clean();
+            error_log($msg);
+            exit(1);
+        }
     }
 }

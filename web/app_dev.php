@@ -11,10 +11,13 @@ require WEB_ROOT . 'app/bootstrap.php';
 
 
 $app = new App\App(\App\Env::DEV);
+$app->initialize();
+
+$a['sdf'];
+
 $config = $app->config();
 
-echo "<pre>" . print_r($config, true) . "</pre>";
-
+var_dump("Ok");
 
 //$App->run();
 

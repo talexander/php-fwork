@@ -35,6 +35,11 @@ class App {
 
     private static $initialized = false;
 
+    /**
+     * @var null|\Monolog\Logger
+     */
+    public $logger = null;
+
 
 
 
@@ -62,19 +67,54 @@ class App {
     public function __construct($envAlias) {
         static::$Instance = $this;
         $this->env = new Env($envAlias);
-        $this->initialize();
     }
 
     /**
      * @return App
      */
-    private function initialize() {
-//        new \App\ErrorHandler();
-        // @TODO: реализовать обработку непойманных эксепшенов
-//        set_exception_handler('\App\ErrorHandler::processException');
-        set_error_handler('\App\ErrorHandler::processError');
+    public function initialize() {
+        date_default_timezone_set($this->config()->timezone);
+        setlocale(LC_ALL, $this->config()->locale);
+
+        $this->logger = $this->getLogger('app', new \Monolog\Handler\StreamHandler(WEB_ROOT . $this->config()->path->log . 'app.log'));
+
+        set_exception_handler('\App\ErrorHandler::processException');
+
+        if(!$this->env->isDev() && !$this->env->isTest()) {
+            set_error_handler('\App\ErrorHandler::processError');
+        }
+
+        register_shutdown_function(array('\App\App', 'shutdownHandler'));
 
         static::$initialized = true;
+    }
+
+    public static function shutdownHandler() {
+        if(!static::$initialized) {
+            return false;
+        }
+
+        if ($error = error_get_last() AND in_array($error['type'], array(E_PARSE, E_ERROR, E_USER_ERROR))) {
+            // Clean the output buffer
+            ob_get_level() && ob_clean();
+
+            // Fake an exception for nice debugging
+            \App\ErrorHandler::processException(new \App\Exception\ErrorException($error['message'], $error['type'], 0, $error['file'], $error['line']));
+
+            // Shutdown now to avoid a "death loop"
+            exit(1);
+        }
+    }
+
+    /**
+     * @param $channel
+     * @param null|\Monolog\Handler\AbstractProcessingHandler $handler
+     * @return \Monolog\Logger
+     */
+    public function getLogger($channel, $handler = null) {
+        $logger = new \Monolog\Logger($channel);
+        $handler && $logger->pushHandler($handler);
+        return $logger;
     }
 
     public static function auto_load($class, $directory = '') {
