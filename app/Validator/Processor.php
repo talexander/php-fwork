@@ -13,9 +13,9 @@ class Processor {
 	 *
 	 * @return  boolean
 	 */
-	public static function notEmpty($value) {
-		if (is_object($value) AND $value instanceof ArrayObject)
-		{
+	public static function notEmpty($value)
+    {
+		if (is_object($value) AND $value instanceof \ArrayObject) {
 			// Get the array from the ArrayObject
 			$value = $value->getArrayCopy();
 		}
@@ -116,9 +116,7 @@ class Processor {
 			$local_part     = "$word(\\x2e$word)*";
 
 			$expression     = "/^$local_part\\x40$domain$/D";
-		}
-		else
-		{
+		} else {
 			$expression = '/^[-_a-z0-9\'+*$^&%=~!?{}]++(?:\.[-_a-z0-9\'+*$^&%=~!?{}]+)*+@(?:(?![-.])[-a-z0-9.]+(?<![-.])\.[a-z]{2,6}|\d{1,3}(?:\.\d{1,3}){3})$/iD';
 		}
 
@@ -220,59 +218,6 @@ class Processor {
 	}
 
 	/**
-	 * Validates a credit card number, with a Luhn check if possible.
-	 *
-	 * @param   integer         $number credit card number
-	 * @param   string|array    $type   card type, or an array of card types
-	 * @return  boolean
-	 * @uses    Valid::luhn
-	 */
-	public static function creditCard($number, $type = NULL) {
-		// Remove all non-digit characters from the number
-		if (($number = preg_replace('/\D+/', '', $number)) === '')
-			return FALSE;
-
-		if ($type == NULL) {
-			// Use the default type
-			$type = 'default';
-		}
-		elseif (is_array($type)) {
-			foreach ($type as $t) {
-				// Test each type for validity
-				if (self::creditCard($number, $t))
-					return TRUE;
-			}
-
-			return FALSE;
-		}
-
-		$cards = Kohana::$config->load('credit_cards');
-
-		// Check card type
-		$type = strtolower($type);
-
-		if ( ! isset($cards[$type]))
-			return FALSE;
-
-		// Check card number length
-		$length = strlen($number);
-
-		// Validate the card length by the card type
-		if ( ! in_array($length, preg_split('/\D+/', $cards[$type]['length'])))
-			return FALSE;
-
-		// Check card number prefix
-		if ( ! preg_match('/^'.$cards[$type]['prefix'].'/', $number))
-			return FALSE;
-
-		// No Luhn check required
-		if ($cards[$type]['luhn'] == FALSE)
-			return TRUE;
-
-		return self::luhn($number);
-	}
-
-	/**
 	 * Validate a number against the [Luhn](http://en.wikipedia.org/wiki/Luhn_algorithm)
 	 * (mod10) formula.
 	 *
@@ -353,9 +298,7 @@ class Processor {
 
 		if ($utf8 === TRUE) {
 			return (bool) preg_match('/^\pL++$/uD', $str);
-		}
-		else
-		{
+		} else {
 			return ctype_alpha($str);
 		}
 	}
@@ -370,9 +313,7 @@ class Processor {
 	public static function alphaNumeric($str, $utf8 = FALSE) {
 		if ($utf8 === TRUE) {
 			return (bool) preg_match('/^[\pL\pN]++$/uD', $str);
-		}
-		else
-		{
+		} else {
 			return ctype_alnum($str);
 		}
 	}
@@ -387,9 +328,7 @@ class Processor {
 	public static function alphaDash($str, $utf8 = FALSE) {
 		if ($utf8 === TRUE) {
 			$regex = '/^[-\pL\pN_]++$/uD';
-		}
-		else
-		{
+		} else {
 			$regex = '/^[-a-z0-9_]++$/iD';
 		}
 
@@ -406,9 +345,7 @@ class Processor {
 	public static function digit($str, $utf8 = FALSE) {
 		if ($utf8 === TRUE) {
 			return (bool) preg_match('/^\pN++$/uD', $str);
-		}
-		else
-		{
+		} else {
 			return (is_int($str) AND $str >= 0) OR ctype_digit($str);
 		}
 	}
@@ -467,9 +404,7 @@ class Processor {
 		if ($digits > 0) {
 			// Specific number of digits
 			$digits = '{'.( (int) $digits).'}';
-		}
-		else
-		{
+		} else {
 			// Any number of digits
 			$digits = '+';
 		}

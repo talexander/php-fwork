@@ -152,7 +152,7 @@ class App {
         return $this->env->ConfigReader->get($name);
     }
 
-    public static function find_file($file, $ext = NULL, $array = FALSE) {
+    public static function find_file($file, $ext = NULL) {
         if ($ext === NULL) {
             // Use the default extension
             $ext = '.php';
@@ -183,6 +183,21 @@ class App {
         return $found;
     }
 
+    public static function message($file, $path = NULL, $default = NULL) {
+        static $messages;
+
+        if ( ! isset($messages[$file])) {
+            // Create a new message list
+            $messages[$file] = array();
+
+            if ($f = self::find_file('messages/' . $file)) {
+                $arr2 = include $f;
+                $messages[$file] = Util\Arr::merge($messages[$file], (array)$arr2);
+            }
+        }
+
+        return $path === NULL ? $messages[$file] : Util\Arr::path($messages[$file], $path, $default);
+    }
 
 
 }

@@ -3,6 +3,7 @@
 namespace App\Validator;
 
 use \App\Util;
+use \App\App;
 
 class Validator implements \ArrayAccess {
 
@@ -189,8 +190,7 @@ class Validator implements \ArrayAccess {
 		}
 
 		if ($field !== TRUE AND ! isset($this->_labels[$field])) {
-			// Set the field label to the field name
-			$this->_labels[$field] = preg_replace('/[^\pL]+/u', ' ', $field);
+            $this->_labels[$field] = preg_replace('/[^\pL]+/u', ' ', $field);
 		}
 
 		// Store the rule and params for this rule
@@ -329,9 +329,9 @@ class Validator implements \ArrayAccess {
                     // This is a lambda function, there is no error name (errors must be added manually)
                     $error_name = FALSE;
                     $passed = call_user_func_array($rule, $params);
-                } elseif (method_exists('Valid', $rule)) {
+                } elseif (method_exists('Processor', $rule)) {
                     // Use a method in this object
-                    $method = new \ReflectionMethod('Valid', $rule);
+                    $method = new \ReflectionMethod('Processor', $rule);
 
                     // Call static::$rule($this[$field], $param, ...) with Reflection
                     $passed = $method->invokeArgs(NULL, $params);
@@ -363,8 +363,7 @@ class Validator implements \ArrayAccess {
 
 					// This field has an error, stop executing rules
 					break;
-				}
-				elseif (isset($this->_errors[$field])) {
+				} elseif (isset($this->_errors[$field])) {
 					// The callback added the error manually, stop checking rules
 					break;
 				}
@@ -453,8 +452,7 @@ class Validator implements \ArrayAccess {
 					if (is_array($value)) {
 						// All values must be strings
 						$value = implode(', ', Util\Arr::flatten($value));
-					}
-					elseif (is_object($value)) {
+					} elseif (is_object($value)) {
 						// Objects cannot be used in message files
 						continue;
 					}
@@ -482,20 +480,15 @@ class Validator implements \ArrayAccess {
 				}
 			}
 
-			if ($message = Kohana::message($file, "{$field}.{$error}") AND is_string($message)) {
+			if ($message = App::message($file, "{$field}.{$error}") AND is_string($message)) {
 				// Found a message for this field and error
-			}
-			elseif ($message = Kohana::message($file, "{$field}.default") AND is_string($message)) {
+			} elseif ($message = App::message($file, "{$field}.default") AND is_string($message)) {
 				// Found a default message for this field
-			}
-			elseif ($message = Kohana::message($file, $error) AND is_string($message)) {
+			} elseif ($message = App::message($file, $error) AND is_string($message)) {
 				// Found a default message for this error
-			}
-			elseif ($message = Kohana::message('validation', $error) AND is_string($message)) {
+			} elseif ($message = App::message('validation', $error) AND is_string($message)) {
 				// Found a default message for this error
-			}
-			else
-			{
+			} else {
 				// No message exists, display the path expected
 				$message = "{$file}.{$field}.{$error}";
 			}
@@ -504,15 +497,11 @@ class Validator implements \ArrayAccess {
 				if (is_string($translate)) {
 					// Translate the message using specified language
 					$message = __($message, $values, $translate);
-				}
-				else
-				{
+				} else {
 					// Translate the message using the default language
 					$message = __($message, $values);
 				}
-			}
-			else
-			{
+			} else {
 				// Do not translate, just replace the values
 				$message = strtr($message, $values);
 			}
