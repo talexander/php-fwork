@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Validator;
+namespace App\Validation;
 
 use \App\Util;
 use \App\App;
@@ -329,9 +329,9 @@ class Validator implements \ArrayAccess {
                     // This is a lambda function, there is no error name (errors must be added manually)
                     $error_name = FALSE;
                     $passed = call_user_func_array($rule, $params);
-                } elseif (method_exists('Processor', $rule)) {
+                } elseif (method_exists('\App\Validation\Processor', $rule)) {
                     // Use a method in this object
-                    $method = new \ReflectionMethod('Processor', $rule);
+                    $method = new \ReflectionMethod('\App\Validation\Processor', $rule);
 
                     // Call static::$rule($this[$field], $param, ...) with Reflection
                     $passed = $method->invokeArgs(NULL, $params);

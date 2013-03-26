@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Validator\Exception;
+namespace App\Validation\Exception;
 
 
 class Validation extends \App\Exception\Exception {

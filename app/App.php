@@ -117,7 +117,7 @@ class App {
         return $logger;
     }
 
-    public static function auto_load($class, $directory = '') {
+    public static function autoLoad($class, $directory = '') {
         error_log($class . " : " . $directory);
 
         // Transform the class name according to PSR-0
@@ -130,9 +130,14 @@ class App {
             $file      = str_replace('\\', DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR;
         }
 
+        // small hack
+        if(strpos($file, 'App/') === 0) {
+            $file = 'a' . substr($file, 1);
+        }
+
         $file .= str_replace('_', DIRECTORY_SEPARATOR, $class);
 
-        if ($path = self::find_file($file)) {
+        if ($path = self::findFile($file)) {
             // Load the class file
             require $path;
 
@@ -152,7 +157,7 @@ class App {
         return $this->env->ConfigReader->get($name);
     }
 
-    public static function find_file($file, $ext = NULL) {
+    public static function findFile($file, $ext = NULL) {
         if ($ext === NULL) {
             // Use the default extension
             $ext = '.php';
@@ -190,7 +195,7 @@ class App {
             // Create a new message list
             $messages[$file] = array();
 
-            if ($f = self::find_file('messages/' . $file)) {
+            if ($f = self::findFile('messages/' . $file)) {
                 $arr2 = include $f;
                 $messages[$file] = Util\Arr::merge($messages[$file], (array)$arr2);
             }

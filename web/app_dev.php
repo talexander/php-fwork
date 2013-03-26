@@ -7,17 +7,28 @@ require WEB_ROOT . 'vendor/autoload.php';
 require WEB_ROOT . 'app/bootstrap.php';
 
 
+var_dump(123);
 
 
-
-$app = new App\App(\App\Env::DEV);
+$app = new \App\App(\App\Env::DEV);
 $app->initialize();
 
-$a['sdf'];
+$data = array(
+    'k1' => 'sfas',
+);
+$validator = new \App\Validation\Validator($data);
+$validator->rule('k1', 'notEmpty');
+$validator->rule('k1', 'minLength', array(':value', 6));
+print 'check: ' . intval($validator->check()) . "\n";
 
-$config = $app->config();
+if(!intval($validator->check())) {
+    print_r($validator->errors('validation'));
+}
 
-var_dump("Ok");
+
+
+
+exit;
 
 //$App->run();
 

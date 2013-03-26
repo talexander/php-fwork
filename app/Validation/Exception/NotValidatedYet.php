@@ -3,7 +3,7 @@
  * User: tarakanov
  */
 
-namespace App\Validator\Exception;
+namespace App\Validation\Exception;
 
 
 class NotValidatedYet extends \App\Exception\Exception {
